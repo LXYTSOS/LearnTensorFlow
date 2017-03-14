@@ -10,6 +10,7 @@ import sklearn.preprocessing as prep
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
+#xavier初始化器，能够根据某一层网络的输入、输出节点数量自动调整最合适的分布
 def xavier_init(fan_in, fan_out, constant = 1):
     low = -constant * np.sqrt(6.0 / (fan_in + fan_out))
     high = constant * np.sqrt(6.0 / (fan_in + fan_out))
@@ -69,16 +70,21 @@ class AdditiveGaussianNoiseAutoencoder(object):
         return self.sess.run(self.cost, feed_dict = {self.x: X,
             self.scale: self.training_scale})
     
+#    返回自编码器隐藏层的输出结果，提供一个接口来获取抽象后的特征，自编码器的隐藏层的
+#    主要功能就是学习出数据中的高阶特征
     def transform(self, X):
         return self.sess.run(self.hidden, feed_dict = {self.x: X,
             self.scale: self.training_scale})
     
+#    将隐藏层的输出结果作为输入，通过之后的重建层将提取到的高阶特征复原为原始数据
     def generate(self, hidden = None):
         if hidden is None:
             hidden = np.random.normal(size = self.weights['b1'])
         return self.sess.run(self.reconstruction,
                              feed_dict = {self.hidden: hidden})
     
+#    整体运行一遍复原过程，包括提取高阶特征和通过高阶特征复原数据，即包括transform和
+#    generate两部分，输入数据是原始数据，输出数据是复原后的数据。
     def reconstruct(self, X):
         return self.sess.run(self.reconstruction, feed_dict = {self.x: X,
             self.scale: self.training_scale})
@@ -89,12 +95,16 @@ class AdditiveGaussianNoiseAutoencoder(object):
     def getBiases(self):
         return self.sess.run(self.weights['b1'])
 
+#使用sklearn.preprocessing的StandardScaler，现在训练集上fit，再将这个Scaler用到训练
+#数据和测试数据上，必须保证训练数据和测试数据都使用完全相同的Scaler，
+#这样才能保证后面模型处理数据时的一致性。
 def standard_scale(X_train, X_test):
     preprocessor = prep.StandardScaler().fit(X_train)
     X_train = preprocessor.transform(X_train)
     X_test = preprocessor.transform(X_test)
     return X_train, X_test
 
+#随机获取block数据的函数
 def get_random_block_form_data(data, batch_size):
     start_index = np.random.randint(0, len(data) - batch_size)
     return data[start_index:(start_index + batch_size)]
