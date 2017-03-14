@@ -22,7 +22,7 @@ mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 #里，不同session之间的数据和运算应该都是相互独立的。
 sess = tf.InteractiveSession()
 #创建一个Placeholder，即输入数据的地方，第一个参数是数据类型，第二个参数［None，784］代表
-#tensor的shape，也就是数据尺寸，None表示步限条数的输入，784代表每条输入是一个784维的向量
+#tensor的shape，也就是数据尺寸，None表示不限条数的输入，784代表每条输入是一个784维的向量
 x = tf.placeholder(tf.float32, [None, 784])
 
 W = tf.Variable(tf.zeros([784, 10]))
