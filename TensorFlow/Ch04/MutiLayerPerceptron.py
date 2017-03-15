@@ -25,7 +25,7 @@ keep_prob = tf.placeholder(tf.float32)
 
 #通过tf.nn.relu实现一个激活函数为ReLU的隐藏层
 hidden1 = tf.nn.relu(tf.matmul(x, W1) + b1)
-#实现Dropout功能，随机将一部分节点置为0，keep_prob是不值为0的比例
+#实现Dropout功能，随机将一部分节点置为0，keep_prob是不置为0的比例
 hidden1_drop = tf.nn.dropout(hidden1, keep_prob)
 #输出层使用Softmax
 y = tf.nn.softmax(tf.matmul(hidden1_drop, W2) + b2)
