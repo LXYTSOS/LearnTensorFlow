@@ -88,6 +88,15 @@ for i in range(20000):
     train_step.run(feed_dict={x:batch[0], y_:batch[1], keep_prob:0.5})
 
 #全部训练完了后，在最终的测试集上进行全面测试，得到整体的分类准确率
-print("test accuracy %g"%accuracy.eval(feed_dict={x:mnist.test.images,
-                                                  y_:mnist.test.labels,
-                                                  keep_prob:1.0}))
+#print("test accuracy %g"%accuracy.eval(feed_dict={x:mnist.test.images,
+#                                                  y_:mnist.test.labels,
+#                                                  keep_prob:1.0}))
+#以上代码在本机的GPU上运行报错：
+#OOM when allocating tensor with shape[10000,32,28,28]
+#采用下面分批次的代码来减小数据量
+for i in range(10):
+    testSet = mnist.test.next_batch(50)
+    print("test accuracy %g"%accuracy.eval(feed_dict={
+            x: testSet[0],
+            y_: testSet[1],
+            keep_prob:1.0}))
