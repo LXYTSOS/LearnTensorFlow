@@ -118,19 +118,24 @@ def train(mnist):
         test_feed = {x: mnist.test.images, y_: mnist.test.labels}
         
         for i in range(TRAINING_STEPS):
-            if i % 100 == 0:
+            if i % 1000 == 0:
                 validate_acc = sess.run(accuracy, feed_dict=validate_feed)
-                print("After %d training step(s), validation accuracy using average model is %g " %
-                      (i, validate_acc))
+                test_acc = sess.run(accuracy, feed_dict=test_feed)
+                print("After %d training step(s), validation accuracy using average model is %g "
+                      "test accuracy using average model is %g "%
+                      (i, validate_acc, test_acc))
             
             #产生这一batch的训练数据，并运行训练过程
             xs, ys = mnist.train.next_batch(BATCH_SIZE)
             sess.run(train_op, feed_dict={x: xs, y_: ys})
         
         #训练结束后，在测试数据上检测神经网络模型的最终正确率
-        test_acc = sess.run(accuracy, feed_dict=test_feed)
-        print("After %d training step(s), test accuracy using average model is %g " %
-              (TRAINING_STEPS, test_acc))
+#        test_acc = sess.run(accuracy, feed_dict=test_feed)
+#        print("After %d training step(s), test accuracy using average model is %g " %
+#              (TRAINING_STEPS, test_acc))
+        #保存训练模型
+        saver = tf.train.Saver()
+        saver.save(sess, "../model/anotherDigitalRecognizer.ckpt")
 
 #主程序入口
 def main(argv=None):
