@@ -18,8 +18,17 @@ with tf.Session() as sess:
     img_data = tf.image.decode_jpeg(image_raw_data)
     
     #输出解码之后的三维矩阵
-    #print(img_data.eval())
+    print(img_data.eval())
     
     #使用pyplot工具可视化得到图像
     plt.imshow(img_data.eval())
     plt.show()
+    
+    #将数据的类型转化成实数方便样例程序对图像进行处理
+    #保存jpg文件时dtype设定成uint8,用于后面调整大小时设定成float32
+    img_data = tf.image.convert_image_dtype(img_data, dtype=tf.uint8)
+    
+    #将表示一张图像的三维矩阵重新按照jpeg格式编码并存入文件
+    encoded_image = tf.image.encode_jpeg(img_data)
+    with tf.gfile.GFile("../picture/output.jpg", "wb") as f:
+        f.write(encoded_image.eval())
