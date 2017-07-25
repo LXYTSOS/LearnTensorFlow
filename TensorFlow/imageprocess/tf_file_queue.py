@@ -26,7 +26,7 @@ features = tf.parse_single_example(
 
 example, label = features['i'], features['j']
 #一个batch中样例个数
-batch_size = 2
+batch_size = 3
 #组合样例队列中最多可以存储的样例数，如果队列太大，需要占用很多内存资源，如果太小
 #那么出队操作可能会因为没有数据而被阻塞，从而导致训练效率降低，一般来说这个队列大小会和
 #每一个batch的大小有关
@@ -36,8 +36,16 @@ capacity = 1000 + 3 * batch_size
 #batch_size给出了每个batch中样例的个数，capacity给出了队列的最大容量，当队列长度等于
 #最大容量时，TensorFlow将暂停入队操作，而只是等待元素出队，当队列长度小于最大容量时，
 #TensorFlow将自动重新启动入队操作
-example_batch, label_batch = tf.train.batch(
-        [example, label], batch_size=batch_size, capacity=capacity)
+#example_batch, label_batch = tf.train.batch(
+#        [example, label], batch_size=batch_size, capacity=capacity)
+
+#使用tf.train.shuffle_batch函数来组合样例，它的大部分参数和tf.train.batch一样，
+#但是min_after_dequeue参数是它特有的，它限制了元素出队列时队列中元素最少个数，当
+#元素太少是，随机打乱样例顺序作用就不大。当出队函数被调用，但是元素不够时，出队操作
+#将等待更多元素入队才会完成。
+example_batch, label_batch = tf.train.shuffle_batch(
+        [example, label], batch_size=batch_size,
+        capacity=capacity, min_after_dequeue=30)
 
 with tf.Session() as sess:
     #虽然在这里没有声明任何变量，但使用tf.train.match_filenames_once函数时需要
